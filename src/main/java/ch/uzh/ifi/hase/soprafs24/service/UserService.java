@@ -72,4 +72,18 @@ public class UserService {
           String.format(baseErrorMessage, "username", "is"));
     }
   }
+  // Login method: Validates if the user exists and if the password (stored in the "name" field) matches.
+public User loginUser(String username, String password) {
+  // 1. Find user by username.
+  User user = userRepository.findByUsername(username);
+  if (user == null) {
+      throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User does not exist.");
+  }
+  // 2. Validate the password (here, the "name" field is used as the password).
+  if (!user.getName().equals(password)) {
+      throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Incorrect password.");
+  }
+  return user;
+}
+
 }
