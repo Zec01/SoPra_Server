@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
@@ -43,6 +44,7 @@ public class UserService {
     newUser.setToken(UUID.randomUUID().toString());
     newUser.setStatus(UserStatus.OFFLINE);
     checkIfUserExists(newUser);
+    newUser.setCreationDate(LocalDate.now());
     // saves the given entity but data is only persisted in the database once
     // flush() is called
     newUser = userRepository.save(newUser);
