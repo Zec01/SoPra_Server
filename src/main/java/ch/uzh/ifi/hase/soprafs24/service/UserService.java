@@ -42,7 +42,7 @@ public class UserService {
 
   public User createUser(User newUser) {
     newUser.setToken(UUID.randomUUID().toString());
-    newUser.setStatus(UserStatus.OFFLINE);
+    newUser.setStatus(UserStatus.ONLINE);
     checkIfUserExists(newUser);
     newUser.setCreationDate(LocalDate.now());
     // saves the given entity but data is only persisted in the database once
@@ -85,10 +85,19 @@ public class UserService {
     if (!user.getName().equals(password)) {
         throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Incorrect password.");
     }
+    user.setStatus(UserStatus.ONLINE);
+    userRepository.save(user);
     return user;
   }
 
   public User getUserById(Long userId) {
     return userRepository.findById(userId).orElse(null);
+  }
+
+  public void logoutUser(Long userId) {
+    User user = userRepository.findById(userId)
+        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+    user.setStatus(UserStatus.OFFLINE);
+    userRepository.save(user);
   }
 }
