@@ -7,6 +7,7 @@ import ch.uzh.ifi.hase.soprafs24.rest.mapper.DTOMapper;
 import ch.uzh.ifi.hase.soprafs24.service.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -69,5 +70,16 @@ public class UserController {
     
     // Convert the internal representation of the user back to API representation.
     return DTOMapper.INSTANCE.convertEntityToUserGetDTO(loggedInUser);
+  }
+
+  @GetMapping("/users/{userId}")
+  @ResponseStatus(HttpStatus.OK)
+  @ResponseBody
+  public UserGetDTO getUserById(@PathVariable Long userId) {
+      User user = userService.getUserById(userId);
+      if (user == null) {
+          throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User with ID " + userId + " not found.");
+      }
+      return DTOMapper.INSTANCE.convertEntityToUserGetDTO(user);
   }
 }
