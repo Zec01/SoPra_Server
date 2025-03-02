@@ -100,4 +100,23 @@ public class UserService {
     user.setStatus(UserStatus.OFFLINE);
     userRepository.save(user);
   }
+
+  public void updateUser(Long userId, User userData) {
+    User existingUser = userRepository.findById(userId)
+        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+
+    if (userData.getUsername() != null && !userData.getUsername().isEmpty()) {
+        User userByUsername = userRepository.findByUsername(userData.getUsername());
+        if (userByUsername != null && !userByUsername.getId().equals(userId)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Username already taken");
+        }
+        existingUser.setUsername(userData.getUsername());
+    }
+    if (userData.getBirthday() != null) {
+        existingUser.setBirthday(userData.getBirthday());
+    }
+
+    userRepository.save(existingUser);
+  }
+
 }

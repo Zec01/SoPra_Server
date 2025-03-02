@@ -88,4 +88,11 @@ public class UserController {
   public void logoutUser(@PathVariable Long userId) {
       userService.logoutUser(userId);
   }
+
+  @PutMapping("/users/{userId}")
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  public void updateUser(@PathVariable Long userId, @RequestBody User userData) {
+      userService.updateUser(userId, userData);
+  }
+
 }

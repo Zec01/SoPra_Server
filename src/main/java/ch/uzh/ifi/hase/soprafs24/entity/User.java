@@ -41,6 +41,9 @@ public class User implements Serializable {
   @Column(nullable = false)
   private LocalDate creationDate;
 
+  @Column
+  private LocalDate birthday;
+
   public User() {
     this.creationDate = LocalDate.now();
   }
@@ -98,5 +101,13 @@ public class User implements Serializable {
 
   public void setStatus(UserStatus status) {
     this.status = status;
+  }
+
+  public LocalDate getBirthday() {
+    return this.birthday;
+  }
+
+  public void setBirthday(LocalDate birthday) {
+      this.birthday = birthday;
   }
 }
