@@ -12,18 +12,18 @@ public class UserGetDTO {
   private UserStatus status;
   private LocalDate creationDate;
   private String birthday;
+  private String token;
 
   public String getBirthday() {
     return birthday;
   }
   public void setBirthday(String birthday) {
-      this.birthday = birthday;
+    this.birthday = birthday;
   }
 
   public Long getId() {
     return id;
   }
-
   public void setId(Long id) {
     this.id = id;
   }
@@ -31,7 +31,6 @@ public class UserGetDTO {
   public String getName() {
     return name;
   }
-
   public void setName(String name) {
     this.name = name;
   }
@@ -39,13 +38,15 @@ public class UserGetDTO {
   public String getUsername() {
     return username;
   }
-
   public void setUsername(String username) {
     this.username = username;
   }
 
   public UserStatus getStatus() {
     return status;
+  }
+  public void setStatus(UserStatus status) {
+    this.status = status;
   }
 
   public LocalDate getCreationDate() {
@@ -54,7 +55,11 @@ public class UserGetDTO {
   public void setCreationDate(LocalDate creationDate) {
     this.creationDate = creationDate;
   }
-  public void setStatus(UserStatus status) {
-    this.status = status;
+
+  public String getToken() {
+    return token;
+  }
+  public void setToken(String token) {
+    this.token = token;
   }
 }

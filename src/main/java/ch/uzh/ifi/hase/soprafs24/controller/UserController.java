@@ -1,5 +1,6 @@
 package ch.uzh.ifi.hase.soprafs24.controller;
 
+import ch.uzh.ifi.hase.soprafs24.constant.UserStatus;
 import ch.uzh.ifi.hase.soprafs24.entity.User;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.UserGetDTO;
 import ch.uzh.ifi.hase.soprafs24.rest.dto.UserPostDTO;
@@ -56,20 +57,19 @@ public class UserController {
     return DTOMapper.INSTANCE.convertEntityToUserGetDTO(createdUser);
   }
 
-  // New login endpoint.
   @PostMapping("/users/login")
   @ResponseStatus(HttpStatus.OK)
   @ResponseBody
   public UserGetDTO loginUser(@RequestBody UserPostDTO userPostDTO) {
-    // Convert API user to internal representation.
-    // Note: The 'name' field is used as the password.
-    User userInput = DTOMapper.INSTANCE.convertUserPostDTOtoEntity(userPostDTO);
-    
-    // Call the loginUser method in the service using the provided username and password.
-    User loggedInUser = userService.loginUser(userInput.getUsername(), userInput.getName());
-    
-    // Convert the internal representation of the user back to API representation.
-    return DTOMapper.INSTANCE.convertEntityToUserGetDTO(loggedInUser);
+      User userInput = DTOMapper.INSTANCE.convertUserPostDTOtoEntity(userPostDTO);
+      User loggedInUser = userService.loginUser(userInput.getUsername(), userInput.getName());
+      
+      String token = java.util.UUID.randomUUID().toString();
+      loggedInUser.setToken(token);
+      
+      userService.updateUser(loggedInUser.getId(), loggedInUser);
+      
+      return DTOMapper.INSTANCE.convertEntityToUserGetDTO(loggedInUser);
   }
 
   @GetMapping("/users/{userId}")
