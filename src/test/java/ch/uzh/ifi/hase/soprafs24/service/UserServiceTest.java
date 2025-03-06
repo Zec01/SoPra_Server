@@ -57,7 +57,7 @@ public class UserServiceTest {
   @Test
   public void loginUser_success() {
     Mockito.when(userRepository.findByUsername("testUsername")).thenReturn(testUser);
-    User loggedIn = userService.loginUser("testUsername", "testName");
+    User loggedIn = userService.loginUser("testUsername", "User.1234");
     assertEquals(UserStatus.ONLINE, loggedIn.getStatus());
     Mockito.verify(userRepository).save(testUser);
   }
