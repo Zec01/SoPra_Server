@@ -16,6 +16,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.web.server.ResponseStatusException;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 
 import java.util.Collections;
 import java.util.List;
@@ -28,12 +29,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-/**
- * UserControllerTest
- * This is a WebMvcTest which allows to test the UserController i.e. GET/POST
- * request without actually sending them over the network.
- * This tests if the UserController works.
- */
 @WebMvcTest(UserController.class)
 public class UserControllerTest {
 
@@ -43,24 +38,18 @@ public class UserControllerTest {
   @MockBean
   private UserService userService;
 
+  @Autowired
+  private ObjectMapper objectMapper;
+
   @Test
   public void givenUsers_whenGetUsers_thenReturnJsonArray() throws Exception {
-    // given
     User user = new User();
     user.setName("Firstname Lastname");
     user.setUsername("firstname@lastname");
     user.setStatus(UserStatus.OFFLINE);
-
     List<User> allUsers = Collections.singletonList(user);
-
-    // this mocks the UserService -> we define above what the userService should
-    // return when getUsers() is called
     given(userService.getUsers()).willReturn(allUsers);
-
-    // when
     MockHttpServletRequestBuilder getRequest = get("/users").contentType(MediaType.APPLICATION_JSON);
-
-    // then
     mockMvc.perform(getRequest).andExpect(status().isOk())
         .andExpect(jsonPath("$", hasSize(1)))
         .andExpect(jsonPath("$[0].name", is(user.getName())))
@@ -70,26 +59,19 @@ public class UserControllerTest {
 
   @Test
   public void createUser_validInput_userCreated() throws Exception {
-    // given
     User user = new User();
     user.setId(1L);
     user.setName("Test User");
     user.setUsername("testUsername");
     user.setToken("1");
     user.setStatus(UserStatus.ONLINE);
-
     UserPostDTO userPostDTO = new UserPostDTO();
     userPostDTO.setName("Test User");
     userPostDTO.setUsername("testUsername");
-
     given(userService.createUser(Mockito.any())).willReturn(user);
-
-    // when/then -> do the request + validate the result
     MockHttpServletRequestBuilder postRequest = post("/users")
         .contentType(MediaType.APPLICATION_JSON)
         .content(asJsonString(userPostDTO));
-
-    // then
     mockMvc.perform(postRequest)
         .andExpect(status().isCreated())
         .andExpect(jsonPath("$.id", is(user.getId().intValue())))
@@ -98,17 +80,53 @@ public class UserControllerTest {
         .andExpect(jsonPath("$.status", is(user.getStatus().toString())));
   }
 
-  /**
-   * Helper Method to convert userPostDTO into a JSON string such that the input
-   * can be processed
-   * Input will look like this: {"name": "Test User", "username": "testUsername"}
-   * 
-   * @param object
-   * @return string
-   */
+  @Test
+  public void getUserById_success() throws Exception {
+    User user = new User();
+    user.setId(1L);
+    user.setName("Firstname Lastname");
+    user.setUsername("firstname@lastname");
+    user.setStatus(UserStatus.OFFLINE);
+    given(userService.getUserById(1L)).willReturn(user);
+    mockMvc.perform(get("/users/1").contentType(MediaType.APPLICATION_JSON))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.id", is(user.getId().intValue())))
+        .andExpect(jsonPath("$.name", is(user.getName())))
+        .andExpect(jsonPath("$.username", is(user.getUsername())))
+        .andExpect(jsonPath("$.status", is(user.getStatus().toString())));
+  }
+
+  @Test
+  public void getUserById_notFound() throws Exception {
+    given(userService.getUserById(99L)).willReturn(null);
+    mockMvc.perform(get("/users/99").contentType(MediaType.APPLICATION_JSON))
+        .andExpect(status().isNotFound());
+  }
+
+  @Test
+  public void updateUser_success() throws Exception {
+    Mockito.doNothing().when(userService).updateUser(Mockito.eq(1L), Mockito.any());
+    String updateBody = "{\"username\": \"updatedUsername\", \"birthday\": \"2000-01-01\"}";
+    mockMvc.perform(put("/users/1")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(updateBody))
+        .andExpect(status().isNoContent());
+  }
+
+  @Test
+  public void updateUser_notFound() throws Exception {
+    Mockito.doThrow(new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"))
+        .when(userService).updateUser(Mockito.eq(99L), Mockito.any());
+    String updateBody = "{\"username\": \"whatever\"}";
+    mockMvc.perform(put("/users/99")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(updateBody))
+        .andExpect(status().isNotFound());
+  }
+
   private String asJsonString(final Object object) {
     try {
-      return new ObjectMapper().writeValueAsString(object);
+      return objectMapper.writeValueAsString(object);
     } catch (JsonProcessingException e) {
       throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
           String.format("The request body could not be created.%s", e.toString()));
