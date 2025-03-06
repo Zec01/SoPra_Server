@@ -1,4 +1,4 @@
-package ch.uzh.ifi.hase.soprafs24.exceptions;
+package ch.uzh.ifi.hase.soprafs24.exceptions; // Generated with help from my friend Chatgpt
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

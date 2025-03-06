@@ -1,4 +1,4 @@
-package ch.uzh.ifi.hase.soprafs24.exceptions;
+package ch.uzh.ifi.hase.soprafs24.exceptions; // Generated with help from my friend Chatgpt
 
 public class ErrorResponse {
 
@@ -15,8 +15,6 @@ public class ErrorResponse {
         this.path = path;
         this.timestamp = timestamp;
     }
-
-    // Getter und Setter
 
     public int getStatus() {
         return status;
