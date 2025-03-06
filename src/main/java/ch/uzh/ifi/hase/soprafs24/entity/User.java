@@ -6,16 +6,6 @@ import javax.persistence.*;
 import java.io.Serializable;
 import java.time.LocalDate;
 
-/**
- * Internal User Representation
- * This class composes the internal representation of the user and defines how
- * the user is stored in the database.
- * Every variable will be mapped into a database field with the @Column
- * annotation
- * - nullable = false -> this cannot be left empty
- * - unique = true -> this value must be unqiue across the database -> composes
- * the primary key
- */
 @Entity
 @Table(name = "USER")
 public class User implements Serializable {
@@ -27,7 +17,7 @@ public class User implements Serializable {
   private Long id;
 
   @Column(nullable = false)
-  private String name;
+  private String password;
 
   @Column(nullable = false, unique = true)
   private String username;
@@ -63,12 +53,12 @@ public class User implements Serializable {
     this.id = id;
   }
 
-  public String getName() {
-    return name;
+  public String getPassword() {
+    return password;
   }
 
-  public void setName(String name) {
-    this.name = name;
+  public void setPassword(String password) {
+    this.password = password;
   }
 
   public String getUsername() {
@@ -94,7 +84,7 @@ public class User implements Serializable {
   public void setCreationDate(LocalDate creationDate) {
     this.creationDate = creationDate;
   }
-  
+
   public UserStatus getStatus() {
     return status;
   }
@@ -104,10 +94,10 @@ public class User implements Serializable {
   }
 
   public LocalDate getBirthday() {
-    return this.birthday;
+    return birthday;
   }
 
   public void setBirthday(LocalDate birthday) {
-      this.birthday = birthday;
+    this.birthday = birthday;
   }
 }

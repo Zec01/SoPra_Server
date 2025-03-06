@@ -16,13 +16,6 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
-/**
- * User Service
- * This class is the "worker" and responsible for all functionality related to
- * the user
- * (e.g., it creates, modifies, deletes, finds). The result will be passed back
- * to the caller.
- */
 @Service
 @Transactional
 public class UserService {
@@ -45,8 +38,6 @@ public class UserService {
     newUser.setStatus(UserStatus.ONLINE);
     checkIfUserExists(newUser);
     newUser.setCreationDate(LocalDate.now());
-    // saves the given entity but data is only persisted in the database once
-    // flush() is called
     newUser = userRepository.save(newUser);
     userRepository.flush();
 
@@ -54,33 +45,20 @@ public class UserService {
     return newUser;
   }
 
-  /**
-   * This is a helper method that will check the uniqueness criteria of the
-   * username and the name
-   * defined in the User entity. The method will do nothing if the input is unique
-   * and throw an error otherwise.
-   *
-   * @param userToBeCreated
-   * @throws org.springframework.web.server.ResponseStatusException
-   * @see User
-   */
   private void checkIfUserExists(User userToBeCreated) {
     User userByUsername = userRepository.findByUsername(userToBeCreated.getUsername());
-    //User userByName = userRepository.findByName(userToBeCreated.getName());
     if (userByUsername != null) {
       throw new ResponseStatusException(HttpStatus.CONFLICT, "Username already taken");
     }
   }
-  // Login method: Validates if the user exists and if the password (stored in the "name" field) matches.
+
   public User loginUser(String username, String password) {
-    // 1. Find user by username.
     User user = userRepository.findByUsername(username);
     if (user == null) {
-        throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User does not exist.");
+      throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User does not exist.");
     }
-    // 2. Validate the password (here, the "name" field is used as the password).
-    if (!user.getName().equals(password)) {
-        throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Incorrect password.");
+    if (!user.getPassword().equals(password)) {
+      throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Incorrect password.");
     }
     user.setStatus(UserStatus.ONLINE);
     userRepository.save(user);
@@ -103,17 +81,15 @@ public class UserService {
         .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
 
     if (userData.getUsername() != null && !userData.getUsername().isEmpty()) {
-        User userByUsername = userRepository.findByUsername(userData.getUsername());
-        if (userByUsername != null && !userByUsername.getId().equals(userId)) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Username already taken");
-        }
-        existingUser.setUsername(userData.getUsername());
+      User userByUsername = userRepository.findByUsername(userData.getUsername());
+      if (userByUsername != null && !userByUsername.getId().equals(userId)) {
+        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Username already taken");
+      }
+      existingUser.setUsername(userData.getUsername());
     }
     if (userData.getBirthday() != null) {
-        existingUser.setBirthday(userData.getBirthday());
+      existingUser.setBirthday(userData.getBirthday());
     }
-
     userRepository.save(existingUser);
   }
-
 }

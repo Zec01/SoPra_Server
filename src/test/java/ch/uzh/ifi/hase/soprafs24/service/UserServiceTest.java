@@ -31,7 +31,7 @@ public class UserServiceTest {
     MockitoAnnotations.openMocks(this);
     testUser = new User();
     testUser.setId(1L);
-    testUser.setName("testName");
+    testUser.setPassword("User.1234");
     testUser.setUsername("testUsername");
     Mockito.when(userRepository.save(Mockito.any())).thenReturn(testUser);
   }
@@ -41,7 +41,7 @@ public class UserServiceTest {
     User createdUser = userService.createUser(testUser);
     Mockito.verify(userRepository, Mockito.times(1)).save(Mockito.any());
     assertEquals(testUser.getId(), createdUser.getId());
-    assertEquals(testUser.getName(), createdUser.getName());
+    assertEquals(testUser.getPassword(), createdUser.getPassword());
     assertEquals(testUser.getUsername(), createdUser.getUsername());
     assertNotNull(createdUser.getToken());
     assertEquals(UserStatus.ONLINE, createdUser.getStatus());
@@ -50,7 +50,6 @@ public class UserServiceTest {
   @Test
   public void createUser_duplicateInputs_throwsException() {
     userService.createUser(testUser);
-    Mockito.when(userRepository.findByName(Mockito.any())).thenReturn(testUser);
     Mockito.when(userRepository.findByUsername(Mockito.any())).thenReturn(testUser);
     assertThrows(ResponseStatusException.class, () -> userService.createUser(testUser));
   }

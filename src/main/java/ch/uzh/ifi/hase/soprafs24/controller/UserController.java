@@ -62,7 +62,7 @@ public class UserController {
   @ResponseBody
   public UserGetDTO loginUser(@RequestBody UserPostDTO userPostDTO) {
       User userInput = DTOMapper.INSTANCE.convertUserPostDTOtoEntity(userPostDTO);
-      User loggedInUser = userService.loginUser(userInput.getUsername(), userInput.getName());
+      User loggedInUser = userService.loginUser(userInput.getUsername(), userInput.getPassword());
       
       String token = java.util.UUID.randomUUID().toString();
       loggedInUser.setToken(token);
